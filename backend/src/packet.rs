@@ -1,3 +1,9 @@
+//! Décodage des trames capturées : Ethernet (avec VLAN) ou bouclage, puis
+//! IPv4 ou IPv6, puis TCP ou UDP.
+//!
+//! Le décodage est écrit à la main, sans dépendance, et ne panique jamais :
+//! chaque lecture vérifie d'abord la longueur de la trame.
+
 use std::fmt;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 
@@ -31,6 +37,7 @@ impl LinkType {
     }
 }
 
+/// Couche transport d'un paquet IP.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Transport {
     Tcp {
@@ -50,6 +57,7 @@ pub enum Transport {
     Other(u8),
 }
 
+/// Paquet IP décodé : les seules informations dont la détection a besoin.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ParsedPacket {
     pub source: IpAddr,
@@ -58,7 +66,8 @@ pub struct ParsedPacket {
 }
 
 impl ParsedPacket {
-    /// Vrai pour une demande d'ouverture de connexion TCP (SYN sans ACK).
+    /// Port visé par une demande d'ouverture de connexion TCP (SYN sans ACK),
+    /// `None` pour tout autre paquet.
     pub fn syn_destination_port(&self) -> Option<u16> {
         match self.transport {
             Transport::Tcp {
@@ -151,6 +160,7 @@ pub fn parse(link: LinkType, data: &[u8]) -> Result<ParsedPacket, String> {
     }
 }
 
+/// Décode une trame Ethernet, étiquettes VLAN comprises.
 fn parse_ethernet(data: &[u8]) -> Result<ParsedPacket, String> {
     // Un en-tête Ethernet standard occupe 14 octets.
     if data.len() < 14 {
@@ -177,6 +187,7 @@ fn parse_ethernet(data: &[u8]) -> Result<ParsedPacket, String> {
     }
 }
 
+/// Décode un en-tête IPv4 commençant à `network_offset`.
 fn parse_ipv4(data: &[u8], network_offset: usize) -> Result<ParsedPacket, String> {
     // L'en-tête IPv4 contient au minimum 20 octets.
     if data.len() < network_offset + 20 {
@@ -222,6 +233,7 @@ fn parse_ipv4(data: &[u8], network_offset: usize) -> Result<ParsedPacket, String
     })
 }
 
+/// Décode un en-tête IPv6 et parcourt ses en-têtes d'extension.
 fn parse_ipv6(data: &[u8], network_offset: usize) -> Result<ParsedPacket, String> {
     // L'en-tête IPv6 standard contient 40 octets.
     if data.len() < network_offset + 40 {
@@ -263,6 +275,8 @@ fn parse_ipv6(data: &[u8], network_offset: usize) -> Result<ParsedPacket, String
     })
 }
 
+/// Lit les ports TCP ou UDP. `later_fragment` indique un fragment qui ne
+/// contient pas l'en-tête de transport.
 fn parse_transport(
     data: &[u8],
     transport_offset: usize,

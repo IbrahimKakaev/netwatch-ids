@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { LOCAL_NODE, scopeOf } from '../models/traffic-model';
 
+// Un hôte affiché sur la carte.
 interface MapNode {
   id: string;
   // 0 : anneau intérieur (réseau local), 1 : anneau extérieur (Internet).
@@ -24,6 +25,7 @@ interface MapNode {
   lastParticle: [number, number];
 }
 
+// Un point en mouvement entre cette machine et un hôte.
 interface Particle {
   node: MapNode;
   outbound: boolean;
@@ -163,6 +165,7 @@ export class NetworkMap {
     this.selectedChange.emit(this.nodeAt(event));
   }
 
+  // Prépare le canvas (taille, densité d'écran) et lance la boucle de dessin.
   private start(): void {
     const canvas = this.canvasRef().nativeElement;
     this.context = canvas.getContext('2d');
@@ -193,6 +196,7 @@ export class NetworkMap {
     this.frame = requestAnimationFrame(loop);
   }
 
+  // Retourne le nœud d'un hôte, en le créant s'il reste de la place sur son anneau.
   private ensureNode(id: string, now: number): MapNode | null {
     const existing = this.nodes.get(id);
     if (existing) {
@@ -214,7 +218,8 @@ export class NetworkMap {
       packets: 0,
       lastActive: now,
       alertUntil: 0,
-      lastParticle: [0, 0],
+      // Aucun point émis pour l'instant : le premier paquet en émet toujours un.
+      lastParticle: [-Infinity, -Infinity],
     };
     this.nodes.set(id, node);
     return node;
@@ -264,6 +269,7 @@ export class NetworkMap {
     }
   }
 
+  // Nœud le plus proche du pointeur, dans la limite du rayon de clic.
   private nodeAt(event: MouseEvent): string | null {
     const bounds = this.canvasRef().nativeElement.getBoundingClientRect();
     const x = event.clientX - bounds.left;
@@ -284,6 +290,7 @@ export class NetworkMap {
     return closest;
   }
 
+  // Dessine une image : anneaux, liens, points en mouvement, nœuds, étiquettes.
   private draw(now: number): void {
     const context = this.context;
     if (!context || this.width === 0) {
@@ -403,6 +410,7 @@ export class NetworkMap {
     }
   }
 
+  // Dessine un nœud, avec son anneau d'alerte et son contour de sélection.
   private drawNode(
     context: CanvasRenderingContext2D,
     x: number,
@@ -448,6 +456,7 @@ export class NetworkMap {
     context.lineWidth = 1;
   }
 
+  // Écrit l'adresse d'un hôte à côté de son nœud.
   private drawLabel(
     context: CanvasRenderingContext2D,
     node: MapNode,
@@ -497,6 +506,7 @@ export class NetworkMap {
     context.fillText(text, x, y);
   }
 
+  // Infobulle du nœud survolé ou sélectionné : adresse complète et état.
   private drawTooltip(context: CanvasRenderingContext2D, node: MapNode, now: number): void {
     const title = node.id;
     const status = node.alertUntil > now ? 'Alerte en cours' : 'Trafic normal';

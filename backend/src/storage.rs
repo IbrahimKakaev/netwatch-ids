@@ -1,3 +1,9 @@
+//! Stockage SQLite : alertes et statistiques de trafic, avec purge automatique.
+//!
+//! Les paquets ne sont jamais enregistrés un par un. Le trafic est agrégé par
+//! minute (total) et par heure (détail par hôte), ce qui garde la base petite
+//! quel que soit le débit du réseau.
+
 use crate::detection::Rule;
 use crate::server::AlertEvent;
 use rusqlite::{Connection, params};
@@ -110,6 +116,15 @@ impl Store {
         Self::with_connection(Connection::open(path)?, retention)
     }
 
+    /// Base en mémoire, pour les tests des autres modules.
+    #[cfg(test)]
+    pub fn in_memory() -> Arc<Self> {
+        let connection = Connection::open_in_memory().unwrap();
+        Arc::new(Self::with_connection(connection, Retention::default()).unwrap())
+    }
+
+    /// Crée les tables si besoin. Le mode WAL laisse l'API lire pendant que
+    /// la capture écrit.
     fn with_connection(connection: Connection, retention: Retention) -> rusqlite::Result<Self> {
         connection.execute_batch(SCHEMA)?;
         Ok(Self {
@@ -124,6 +139,7 @@ impl Store {
             .unwrap_or_else(PoisonError::into_inner)
     }
 
+    /// Plus grand identifiant d'alerte en base, 0 si elle est vide.
     pub fn max_alert_id(&self) -> rusqlite::Result<u64> {
         self.connection()
             .query_row("SELECT COALESCE(MAX(id), 0) FROM alerts", [], |row| {
@@ -337,6 +353,7 @@ impl MinuteRecorder {
         }
     }
 
+    /// Compte un paquet. `host` est l'hôte distant, absent pour un paquet non IP.
     pub fn record(&mut self, timestamp_ms: u64, host: Option<&str>, bytes: u32) {
         let minute_ms = timestamp_ms - timestamp_ms % MINUTE_MS;
         if minute_ms != self.minute_ms
@@ -361,6 +378,7 @@ impl MinuteRecorder {
         }
     }
 
+    /// Écrit en base ce qui a été cumulé, puis repart de zéro.
     fn flush(&mut self) {
         if self.packets > 0
             && let Err(error) =

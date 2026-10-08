@@ -2,6 +2,7 @@ import { inject, Injectable, InjectionToken, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IdsStreamEvent } from '../models/packet.model';
 
+// Adresse du WebSocket du backend ; remplaçable par injection, dans les tests notamment.
 export const IDS_WS_URL = new InjectionToken<string>('IDS_WS_URL', {
   providedIn: 'root',
   factory: () => 'ws://127.0.0.1:3000/ws',
@@ -9,9 +10,12 @@ export const IDS_WS_URL = new InjectionToken<string>('IDS_WS_URL', {
 
 export type ConnectionState = 'connecting' | 'connected' | 'disconnected';
 
+// Délai avant une nouvelle tentative : il double à chaque échec, jusqu'au maximum.
 const INITIAL_RETRY_DELAY_MS = 1000;
 const MAX_RETRY_DELAY_MS = 10000;
 
+// Connexion au flux d'événements du backend, avec reconnexion automatique.
+// L'état de la connexion est exposé à part, pour l'indicateur de l'en-tête.
 @Injectable({
   providedIn: 'root'
 })

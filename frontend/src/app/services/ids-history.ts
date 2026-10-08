@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
+// Adresse de l'API du backend ; remplaçable par injection.
 export const IDS_API_URL = new InjectionToken<string>('IDS_API_URL', {
   providedIn: 'root',
   factory: () => 'http://127.0.0.1:3000',

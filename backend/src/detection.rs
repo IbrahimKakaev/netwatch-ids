@@ -1,3 +1,9 @@
+//! Moteur de détection : des compteurs par adresse source, sur fenêtre
+//! glissante, déclenchent trois règles (débit élevé, scan de ports, SYN flood).
+//!
+//! Le module ne lit pas l'horloge : l'instant courant est passé en paramètre,
+//! ce qui rend les fenêtres de temps testables.
+
 use crate::packet::ParsedPacket;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -59,6 +65,7 @@ impl Rule {
     }
 }
 
+/// Alerte produite par une règle pour une source.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Detection {
     pub rule: Rule,
@@ -66,6 +73,7 @@ pub struct Detection {
     pub message: String,
 }
 
+/// Activité récente d'une adresse source.
 #[derive(Default)]
 struct SourceState {
     packets: VecDeque<Instant>,
@@ -75,6 +83,7 @@ struct SourceState {
 }
 
 impl SourceState {
+    /// Oublie ce qui est sorti de la fenêtre glissante.
     fn expire(&mut self, now: Instant, window: Duration) {
         while self
             .packets
@@ -102,6 +111,7 @@ impl SourceState {
         true
     }
 
+    /// Vrai quand la source n'a plus d'activité récente ni d'alerte en cours de silence.
     fn is_idle(&self, now: Instant, cooldown: Duration) -> bool {
         self.packets.is_empty()
             && self.syns.is_empty()
@@ -133,10 +143,12 @@ impl Detector {
         }
     }
 
+    /// Vrai si l'adresse appartient à la machine qui capture.
     pub fn is_local(&self, address: &IpAddr) -> bool {
         self.local_addresses.contains(address)
     }
 
+    /// Prend en compte un paquet et retourne les alertes qu'il déclenche.
     pub fn observe(&mut self, packet: &ParsedPacket, now: Instant) -> Vec<Detection> {
         self.prune_if_due(now);
 

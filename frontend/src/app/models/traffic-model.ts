@@ -5,6 +5,7 @@ export const LOCAL_NODE = 'local';
 
 export type HostScope = 'lan' | 'internet' | 'broadcast';
 
+// Vue en lecture seule d'un hôte, recopiée pour l'affichage.
 export interface HostView {
   id: string;
   label: string;
@@ -19,6 +20,7 @@ export interface HostView {
   alerts: number;
 }
 
+// Compteurs d'un hôte, modifiés en place à chaque paquet.
 interface HostStats {
   ip: string;
   scope: HostScope;
@@ -62,6 +64,7 @@ const KNOWN_SERVICES: Record<number, string> = {
   5355: 'LLMNR',
 };
 
+// Classe une adresse : réseau local, Internet ou diffusion (multicast, broadcast).
 export function scopeOf(ip: string): HostScope {
   if (ip.includes(':')) {
     const address = ip.toLowerCase();
@@ -215,6 +218,7 @@ export class TrafficModel {
     return count;
   }
 
+  // Retourne les compteurs d'un hôte, en les créant au besoin.
   private host(ip: string): HostStats {
     let host = this.hosts.get(ip);
     if (!host) {
@@ -256,6 +260,7 @@ export class TrafficModel {
   }
 }
 
+// Ajoute en tête d'une liste bornée aux paquets les plus récents.
 function pushRecent(packets: PacketInfo[], packet: PacketInfo): void {
   packets.unshift(packet);
   if (packets.length > MAX_RECENT_PACKETS) {

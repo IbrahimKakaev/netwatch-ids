@@ -18,6 +18,8 @@ const REFRESHES_PER_SECOND = 1000 / REFRESH_MS;
 // Durée pendant laquelle un nœud reste rouge sur la carte après une alerte.
 const ALERT_HIGHLIGHT_MS = 60000;
 
+// Composant racine : reçoit le flux d'événements du backend, le confie au
+// modèle d'agrégation et à la carte, et rafraîchit l'affichage à rythme fixe.
 @Component({
   selector: 'app-root',
   imports: [DatePipe, DecimalPipe, NetworkMap, TrafficHistory],
@@ -26,8 +28,12 @@ const ALERT_HIGHLIGHT_MS = 60000;
 })
 export class App {
   private readonly websocketService = inject(IdsWebsocketService);
+  // Le modèle est modifié à chaque paquet, sans passer par les signaux :
+  // seul updateView() publie son état vers le gabarit.
   private readonly model = new TrafficModel();
   private readonly map = viewChild(NetworkMap);
+  // Paquets reçus depuis le dernier rafraîchissement, et compteurs des
+  // rafraîchissements de la dernière seconde : leur somme donne le débit.
   private packetsSinceRefresh = 0;
   private recentRates: number[] = [];
 
@@ -37,6 +43,7 @@ export class App {
   protected readonly url = this.websocketService.url;
   protected readonly state = this.websocketService.state;
 
+  // État affiché par le gabarit.
   protected readonly alerts = signal<AlertInfo[]>([]);
   protected readonly packets = signal<PacketInfo[]>([]);
   protected readonly topHosts = signal<HostView[]>([]);
@@ -48,6 +55,7 @@ export class App {
   // Les identifiants sont attribués par le backend depuis son démarrage : le
   // plus récent donne le total, même si la liste affichée est tronquée.
   protected readonly totalAlerts = computed(() => this.alerts()[0]?.id ?? 0);
+  // Alertes de l'hôte sélectionné, ou de cette machine si c'est elle.
   protected readonly selectedAlerts = computed(() => {
     const id = this.selectedId();
     return this.alerts().filter((alert) =>
@@ -112,22 +120,26 @@ export class App {
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
 
+  // Sélectionne un hôte (ou aucun) : le détail et le flux suivent aussitôt.
   protected select(id: string | null): void {
     this.selectedId.set(id);
     this.updateView();
   }
 
+  // Fige ou relance le flux affiché ; la capture, elle, continue.
   protected togglePause(): void {
     this.paused.update((paused) => !paused);
     this.updateView();
   }
 
+  // Appelé à intervalle fixe : met à jour le débit puis l'affichage.
   private refresh(): void {
     this.recentRates = [...this.recentRates, this.packetsSinceRefresh].slice(-REFRESHES_PER_SECOND);
     this.packetsSinceRefresh = 0;
     this.updateView();
   }
 
+  // Recopie l'état du modèle dans les signaux lus par le gabarit.
   private updateView(): void {
     let id = this.selectedId();
     const host = id ? this.model.snapshot(id) : null;

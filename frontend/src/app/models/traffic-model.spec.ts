@@ -141,6 +141,28 @@ describe('TrafficModel', () => {
     expect(local?.services).toEqual([LOCAL_IP]);
   });
 
+  it('should bound memory by forgetting the oldest host, alerting ones last', () => {
+    model.addPacket(packet({ destination_ip: '10.0.0.1' }), 1);
+    model.addAlert(alert({ source_ip: '10.0.0.1' }));
+    model.addPacket(packet({ destination_ip: '10.0.0.2' }), 2);
+    for (let index = 0; index < 498; index++) {
+      model.addPacket(packet({ destination_ip: `172.16.${Math.floor(index / 250)}.${index % 250}` }), 1000);
+    }
+    expect(model.snapshot('10.0.0.2')).not.toBeNull();
+
+    // Le 501e hôte prend la place du plus ancien qui n'est pas en alerte.
+    model.addPacket(packet({ destination_ip: '8.8.8.8' }), 2000);
+
+    expect(model.snapshot('10.0.0.2')).toBeNull();
+    expect(model.snapshot('10.0.0.1')?.alerts).toBe(1);
+    expect(model.snapshot('8.8.8.8')).not.toBeNull();
+  });
+
+  it('should ignore a selection the model no longer knows', () => {
+    expect(model.snapshot('203.0.113.1')).toBeNull();
+    expect(model.recentPackets('203.0.113.1')).toEqual([]);
+  });
+
   it('should forget everything on reset', () => {
     model.addPacket(packet(), 1000);
     model.reset();

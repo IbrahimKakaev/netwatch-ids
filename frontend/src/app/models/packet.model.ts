@@ -1,3 +1,4 @@
+// Paquet capturé, tel que le backend l'envoie sur le WebSocket.
 export interface PacketInfo {
   packet_number: number;
   packet_length: number;
@@ -14,6 +15,7 @@ export interface PacketInfo {
 
 export type AlertRule = 'high_rate' | 'port_scan' | 'syn_flood';
 
+// Alerte levée par une règle de détection du backend.
 export interface AlertInfo {
   id: number;
   packet_number: number;
