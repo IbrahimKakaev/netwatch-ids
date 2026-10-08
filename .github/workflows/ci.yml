@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (Rust)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer libpcap
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Format
+        run: cargo fmt --check
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests
+        run: cargo test
+
+  frontend:
+    name: Frontend (Angular)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Tests
+        run: npm test -- --watch=false
+      - name: Build
+        run: npm run build
