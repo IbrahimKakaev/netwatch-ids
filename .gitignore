@@ -1,0 +1,13 @@
+# Rust
+backend/target/
+
+# Configuration de l'éditeur de liens propre à chaque machine
+backend/.cargo/
+
+# Base de données locale de l'IDS
+*.db
+*.db-shm
+*.db-wal
+
+# Fichiers système
+.DS_Store
