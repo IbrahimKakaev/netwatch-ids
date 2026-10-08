@@ -47,9 +47,9 @@ const NARROW_WIDTH = 620;
 
 const OK_COLOR = '53, 211, 154';
 const ALERT_COLOR = '255, 107, 87';
-const TEXT = '#e8eef1';
-const TEXT_MUTED = '#8fa1ab';
-const SURFACE = '#101a22';
+const TEXT = '#e6edf3';
+const TEXT_MUTED = '#8696a5';
+const SURFACE = '#10171f';
 const LABEL_FONT = '11px ui-monospace, SFMono-Regular, Consolas, monospace';
 
 // Carte animée du trafic : cette machine au centre, les hôtes distants autour.

@@ -70,7 +70,7 @@ const ATTACKS: Attack[] = [
     rule: 'port_scan',
     alertAfter: 20,
     message: '203.0.113.66 a sondé 20 ports distincts en 10 s',
-    port: (index) => 20 + index,
+    port: (index) => 1000 + index * 7,
   },
   {
     startMs: 30000,

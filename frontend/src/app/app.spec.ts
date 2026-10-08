@@ -97,7 +97,7 @@ describe('App', () => {
   });
 
   it('should render title', () => {
-    expect(compiled.querySelector('h1')?.textContent).toContain('IDS Traffic Dashboard');
+    expect(compiled.querySelector('h1')?.textContent).toContain('NetWatch');
   });
 
   it('should batch packets instead of rendering each one', () => {

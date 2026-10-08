@@ -1,1 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+/* Le thème est sombre partout : le fond de page évite tout liseré clair. */
+html,
+body {
+	margin: 0;
+	background: #0a0f14;
+	color-scheme: dark;
+}

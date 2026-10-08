@@ -1,9 +1,16 @@
 <main class="dashboard-shell">
-  <header class="dashboard-header">
-    <div>
-      <p class="eyebrow">NETWORK OBSERVABILITY</p>
-      <h1>IDS Traffic Dashboard</h1>
-      <p class="subtitle">Surveillance des paquets réseau en temps réel</p>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" />
+        <circle cx="16" cy="16" r="7" />
+        <path d="M16 16 L25.2 6.8" />
+        <circle class="brand-dot" cx="16" cy="16" r="2.5" />
+      </svg>
+      <div>
+        <h1>NetWatch <span>IDS</span></h1>
+        <p class="subtitle">Détection d'intrusion réseau en temps réel</p>
+      </div>
     </div>
     <div class="connection-status" [class.connected]="state() === 'connected'" role="status">
       <span class="status-dot"></span>
@@ -53,8 +60,8 @@
   <section class="map-panel" aria-label="Carte du trafic">
     <div class="map-stage">
       <div class="map-heading">
-        <p class="eyebrow">CARTE EN DIRECT</p>
-        <h2>Qui parle à cette machine</h2>
+        <h2>Carte du trafic</h2>
+        <span class="tag live">En direct</span>
       </div>
       <app-network-map [selected]="selectedId()" (selectedChange)="select($event)" />
       <ul class="map-legend">
@@ -69,8 +76,8 @@
       @if (selectedHost(); as host) {
         <div class="side-heading">
           <div>
-            <p class="eyebrow">{{ scopeLabels[host.scope] }}</p>
-            <h3>{{ host.label }}</h3>
+            <p class="kicker">{{ scopeLabels[host.scope] }}</p>
+            <h3 class="host-title">{{ host.label }}</h3>
           </div>
           <button type="button" class="ghost-button" (click)="select(null)">Fermer</button>
         </div>
@@ -101,10 +108,7 @@
         }
       } @else {
         <div class="side-heading">
-          <div>
-            <p class="eyebrow">HÔTES</p>
-            <h3>Les plus actifs</h3>
-          </div>
+          <h3>Hôtes les plus actifs</h3>
         </div>
 
         @if (topHosts().length === 0) {
@@ -130,11 +134,8 @@
 
   <section class="traffic-panel alerts-panel">
     <div class="panel-heading">
-      <div>
-        <p class="eyebrow alert-eyebrow">DÉTECTIONS</p>
-        <h2>Alertes</h2>
-      </div>
-      <span class="packet-count">50 max.</span>
+      <h2>Alertes</h2>
+      <span class="packet-count">50 dernières</span>
     </div>
 
     @if (alerts().length === 0) {
@@ -180,20 +181,24 @@
 
   <section class="traffic-panel">
     <div class="panel-heading">
-      <div>
-        <p class="eyebrow">{{ paused() ? 'EN PAUSE' : 'LIVE FEED' }}</p>
+      <div class="heading-group">
         <h2>
           Flux réseau
           @if (selectedHost(); as host) {
             <small>· {{ host.label }}</small>
           }
         </h2>
+        @if (paused()) {
+          <span class="tag">En pause</span>
+        } @else {
+          <span class="tag live">En direct</span>
+        }
       </div>
       <div class="panel-actions">
         @if (selectedId()) {
-          <button type="button" class="ghost-button light" (click)="select(null)">Tout afficher</button>
+          <button type="button" class="ghost-button" (click)="select(null)">Tout afficher</button>
         }
-        <button type="button" class="ghost-button light" [attr.aria-pressed]="paused()" (click)="togglePause()">
+        <button type="button" class="ghost-button" [attr.aria-pressed]="paused()" (click)="togglePause()">
           {{ paused() ? 'Reprendre' : 'Pause' }}
         </button>
       </div>

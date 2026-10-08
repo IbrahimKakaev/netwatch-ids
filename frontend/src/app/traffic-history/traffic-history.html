@@ -1,8 +1,5 @@
 <div class="history-heading">
-  <div>
-    <p class="eyebrow">HISTORIQUE</p>
-    <h2>Trafic enregistré</h2>
-  </div>
+  <h2>Trafic enregistré</h2>
   <div class="range-picker" role="group" aria-label="Période affichée">
     @for (range of ranges; track range.hours) {
       <button type="button" [class.active]="range.hours === hours()" [attr.aria-pressed]="range.hours === hours()" (click)="selectRange(range.hours)">
