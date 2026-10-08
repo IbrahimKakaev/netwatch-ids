@@ -1,4 +1,7 @@
-# IDS Project
+# NetWatch IDS
+
+[![CI](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/ci.yml/badge.svg)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/ci.yml)
+[![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
 Système de détection d'intrusion réseau en temps réel : un moteur de capture et
 de détection écrit en **Rust**, et un dashboard **Angular** qui rend le trafic
@@ -20,10 +23,13 @@ lisible d'un coup d'œil.
   simulé et des attaques rejouées.
 - **Testé** : 26 tests côté Rust, 34 côté Angular, lancés à chaque push.
 
-## Démo sans installation
+## Démo en ligne
+
+**[ibrahimkakaev.github.io/netwatch-ids](https://ibrahimkakaev.github.io/netwatch-ids/)**
 
 Le dashboard embarque un simulateur : trafic ordinaire en continu, puis un scan
-de ports et un SYN flood rejoués chaque minute.
+de ports et un SYN flood rejoués chaque minute. La démo en ligne est publiée
+automatiquement à chaque push. Pour la lancer en local :
 
 ```bash
 cd frontend
@@ -76,6 +82,7 @@ frontend/src/app/
 | Stockage | SQLite (rusqlite) |
 | Interface | Angular 22 (signals, sans zone), canvas 2D |
 | Qualité | cargo test, clippy, rustfmt, Vitest, GitHub Actions |
+| Déploiement | GitHub Pages (démo) |
 
 ## Choix techniques
 
@@ -216,3 +223,7 @@ cd frontend && npm test
   rendrait plus parlants.
 - Le flux n'est pas authentifié : le backend est prévu pour un usage local.
 - La capture suppose un lien Ethernet ou la boucle locale.
+
+## Licence
+
+[MIT](LICENSE)
