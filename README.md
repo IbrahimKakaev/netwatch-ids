@@ -109,6 +109,9 @@ frontend/src/app/
   vérifie l'en-tête `Origin` des WebSockets, que CORS ne protège pas.
 - **Les paquets ne sont pas stockés.** Seuls des agrégats et les alertes vont
   en base : volume maîtrisé, et pas de contenu privé conservé.
+- **Les couleurs ont un seul rôle chacune.** Ambre pour l'interface, vert pour
+  le trafic normal, rouge pour les alertes ; leur écart a été vérifié pour les
+  daltoniens, et une alerte porte toujours un « ! » en plus de sa couleur.
 - **L'affichage est découplé du débit.** Le dashboard reçoit chaque paquet mais
   ne se redessine que deux fois par seconde ; la carte anime des échanges, pas
   des paquets.
@@ -217,6 +220,18 @@ supprime les données expirées au démarrage puis toutes les heures.
   7 jours ou 30 jours. Les intervalles où une alerte s'est produite sont marqués
   d'un « ! ». Il survit aux redémarrages du backend.
 - **Flux réseau** : rafraîchi deux fois par seconde, avec un bouton de pause.
+- **Indicateurs** : le débit des trente dernières secondes en mini-graphique,
+  et la répartition du trafic par protocole.
+
+| Touche | Action |
+| --- | --- |
+| `P` | Mettre le flux en pause ou le relancer |
+| `Échap` | Désélectionner l'hôte |
+| `1` à `4` | Période de l'historique : 1 heure, 24 heures, 7 jours, 30 jours |
+
+L'habillage reprend les codes des outils en terminal (htop, k9s, Wireshark) :
+police à chasse fixe, panneaux titrés sur leur bordure, un seul accent de
+couleur. Les alertes en direct sont annoncées aux lecteurs d'écran.
 
 ## Tests
 

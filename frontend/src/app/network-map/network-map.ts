@@ -49,10 +49,10 @@ const NARROW_WIDTH = 620;
 
 const OK_COLOR = '53, 211, 154';
 const ALERT_COLOR = '255, 107, 87';
-const TEXT = '#e6edf3';
-const TEXT_MUTED = '#8696a5';
-const SURFACE = '#10171f';
-const LABEL_FONT = '11px ui-monospace, SFMono-Regular, Consolas, monospace';
+const TEXT = '#dfe5dc';
+const TEXT_MUTED = '#8a948b';
+const SURFACE = '#0e1110';
+const LABEL_FONT = "11px 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
 
 // Carte animée du trafic : cette machine au centre, les hôtes distants autour.
 // Les points verts représentent les échanges ; un nœud rouge signale une alerte.
@@ -397,7 +397,7 @@ export class NetworkMap {
       context.arc(centerX, centerY, 4, 0, Math.PI * 2);
       context.fill();
     }
-    context.font = '600 12px Arial, sans-serif';
+    context.font = `700 ${LABEL_FONT}`;
     context.textAlign = 'center';
     this.drawText(context, 'Cette machine', centerX, centerY + 32, TEXT);
 
@@ -438,7 +438,7 @@ export class NetworkMap {
     if (alerting) {
       // Le « ! » double la couleur : l'alerte reste lisible sans distinguer le rouge du vert.
       context.fillStyle = SURFACE;
-      context.font = `700 ${Math.round(radius * 1.4)}px Arial, sans-serif`;
+      context.font = `700 ${Math.round(radius * 1.4)}px ui-monospace, Menlo, Consolas, monospace`;
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText('!', x, y + 0.5);

@@ -163,6 +163,19 @@ describe('TrafficModel', () => {
     expect(model.recentPackets('203.0.113.1')).toEqual([]);
   });
 
+  it('should report the protocol mix, non-IP traffic included', () => {
+    model.addPacket(packet(), 1);
+    model.addPacket(packet(), 1);
+    model.addPacket(packet({ protocol: 'UDP' }), 1);
+    model.addPacket(packet({ source_ip: null, destination_ip: null, protocol: null }), 1);
+
+    expect(model.protocolShares(2)).toEqual([
+      { label: 'TCP', packets: 2, percent: 50 },
+      { label: 'UDP', packets: 1, percent: 25 },
+    ]);
+    expect(model.protocolShares(5)[2].label).toBe('Non IP');
+  });
+
   it('should forget everything on reset', () => {
     model.addPacket(packet(), 1000);
     model.reset();
@@ -170,5 +183,6 @@ describe('TrafficModel', () => {
     expect(model.topHosts(5)).toEqual([]);
     expect(model.recentPackets(null)).toEqual([]);
     expect(model.lastPacketNumber).toBe(0);
+    expect(model.protocolShares(5)).toEqual([]);
   });
 });

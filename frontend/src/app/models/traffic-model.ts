@@ -109,12 +109,21 @@ export function serviceOf(packet: PacketInfo): string | null {
   return port < 1024 ? `${protocol} ${port}` : protocol;
 }
 
+export interface ProtocolShare {
+  label: string;
+  packets: number;
+  // Part du trafic observé, en pourcentage.
+  percent: number;
+}
+
 // Agrège le flux de paquets par hôte distant, pour un affichage lisible.
 export class TrafficModel {
   private readonly hosts = new Map<string, HostStats>();
   private readonly localAddresses = new Set<string>();
   private local = { sent: 0, received: 0, bytes: 0, alerts: 0, lastSeen: 0 };
   private recent: PacketInfo[] = [];
+  private readonly protocols = new Map<string, number>();
+  private packetCount = 0;
 
   public lastPacketNumber = 0;
 
@@ -123,6 +132,8 @@ export class TrafficModel {
     this.localAddresses.clear();
     this.local = { sent: 0, received: 0, bytes: 0, alerts: 0, lastSeen: 0 };
     this.recent = [];
+    this.protocols.clear();
+    this.packetCount = 0;
     this.lastPacketNumber = 0;
   }
 
@@ -130,6 +141,10 @@ export class TrafficModel {
   public addPacket(packet: PacketInfo, now: number): string | null {
     this.lastPacketNumber = packet.packet_number;
     pushRecent(this.recent, packet);
+
+    const protocol = packet.protocol ?? 'Non IP';
+    this.protocols.set(protocol, (this.protocols.get(protocol) ?? 0) + 1);
+    this.packetCount += 1;
 
     const peer = packet.outbound ? packet.destination_ip : packet.source_ip;
     if (!peer) {
@@ -206,6 +221,18 @@ export class TrafficModel {
       .sort((a, b) => Math.sign(b.alerts) - Math.sign(a.alerts) || b.packets - a.packets)
       .slice(0, limit)
       .map(toView);
+  }
+
+  // Répartition du trafic par protocole, du plus au moins fréquent.
+  public protocolShares(limit: number): ProtocolShare[] {
+    return [...this.protocols.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([label, packets]) => ({
+        label,
+        packets,
+        percent: Math.round((packets / this.packetCount) * 100),
+      }));
   }
 
   public activeHostCount(now: number): number {

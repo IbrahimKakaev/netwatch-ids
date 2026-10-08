@@ -24,7 +24,7 @@ const REFRESH_MS = 60000;
 export class TrafficHistory {
   private readonly historyService = inject(IdsHistoryService);
 
-  protected readonly ranges = [
+  public readonly ranges = [
     { hours: 1, label: '1 h' },
     { hours: 24, label: '24 h' },
     { hours: 168, label: '7 j' },
@@ -105,7 +105,8 @@ export class TrafficHistory {
     );
   });
 
-  protected selectRange(hours: number): void {
+  // Public : le composant racine s'en sert pour les raccourcis clavier.
+  public selectRange(hours: number): void {
     this.hovered.set(null);
     this.hours.set(hours);
   }

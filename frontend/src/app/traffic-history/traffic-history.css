@@ -1,13 +1,13 @@
 :host {
+	position: relative;
 	display: block;
 	width: 100%;
-	max-width: 1280px;
-	margin: 0 auto 16px;
-	border: 1px solid var(--line);
-	border-radius: 8px;
+	max-width: 1320px;
+	margin: 0 auto 24px;
+	border: 1px solid var(--line-strong);
 	color: var(--ink);
 	background: var(--panel);
-	font-size: 0.82rem;
+	font-size: 0.76rem;
 }
 
 * {
@@ -19,35 +19,46 @@ h2 {
 	margin: 0;
 }
 
+/* Titre et sélecteur de période posés sur la bordure, comme les autres panneaux. */
 .history-heading {
+	position: absolute;
+	top: -0.72rem;
+	right: 10px;
+	left: 10px;
+	z-index: 2;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 16px;
-	padding: 10px 18px;
-	border-bottom: 1px solid var(--line);
+}
+
+.history-heading > * {
+	padding: 0 8px;
+	background: var(--bg);
 }
 
 h2 {
-	font-size: 0.95rem;
-	font-weight: 600;
+	white-space: nowrap;
+	color: var(--accent);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
 }
 
 .range-picker {
 	display: flex;
-	padding: 2px;
-	border: 1px solid var(--line-strong);
-	border-radius: 6px;
-	background: var(--panel-raised);
+	flex: none;
+	gap: 6px;
 }
 
 .range-picker button {
-	padding: 4px 12px;
-	border: 0;
-	border-radius: 4px;
+	padding: 1px 8px;
+	border: 1px solid var(--line-strong);
 	color: var(--muted);
-	background: none;
-	font: 500 0.75rem var(--sans);
+	background: var(--bg);
+	font: 0.72rem var(--mono);
+	white-space: nowrap;
 	cursor: pointer;
 }
 
@@ -56,9 +67,10 @@ h2 {
 }
 
 .range-picker button.active {
-	color: var(--ink);
-	background: var(--accent-soft);
-	box-shadow: inset 0 0 0 1px var(--accent);
+	border-color: var(--accent);
+	color: var(--bg);
+	background: var(--accent);
+	font-weight: 700;
 }
 
 button:focus-visible {
@@ -71,35 +83,39 @@ button:focus-visible {
 	grid-template-columns: minmax(0, 1fr) 300px;
 }
 
+/* Le graphique occupe toute la hauteur laissée par la colonne de droite. */
 .chart-area {
+	display: flex;
+	flex-direction: column;
 	min-width: 0;
-	padding: 16px 18px;
+	padding: 20px 16px 12px;
 }
 
 .chart-title,
 .side-title,
 .period-totals dt {
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 	color: var(--muted);
-	font-size: 0.7rem;
-	font-weight: 500;
-	letter-spacing: 0.04em;
+	font-size: 0.68rem;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
 
 .chart {
 	display: flex;
+	flex: 1;
 	gap: 10px;
-	height: 250px;
+	min-height: 200px;
 }
 
 .y-axis {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	min-width: 40px;
+	min-width: 44px;
 	color: var(--muted);
-	font: 0.7rem/1 var(--mono);
+	font-size: 0.68rem;
+	line-height: 1;
 	text-align: right;
 }
 
@@ -116,7 +132,7 @@ button:focus-visible {
 	position: absolute;
 	right: 0;
 	left: 0;
-	border-top: 1px solid var(--line);
+	border-top: 1px dashed var(--line);
 }
 
 .grid-line.top {
@@ -137,12 +153,11 @@ button:focus-visible {
 }
 
 .column.hovered {
-	background: rgb(255 255 255 / 6%);
+	background: rgb(255 255 255 / 7%);
 }
 
 .bar {
 	width: 100%;
-	border-radius: 3px 3px 0 0;
 	background: var(--accent);
 }
 
@@ -160,7 +175,7 @@ button:focus-visible {
 	box-sizing: content-box;
 	color: var(--panel);
 	background: var(--alert);
-	font: 700 9px/1 var(--sans);
+	font: 700 9px/1 var(--mono);
 	transform: translateX(-50%);
 }
 
@@ -179,19 +194,14 @@ button:focus-visible {
 	z-index: 2;
 	display: grid;
 	gap: 2px;
-	padding: 8px 10px;
-	border: 1px solid var(--line-strong);
-	border-radius: 6px;
+	padding: 6px 10px;
+	border: 1px solid var(--accent);
 	color: var(--ink);
-	background: #05090d;
-	font-size: 0.75rem;
+	background: var(--bg);
+	font-size: 0.72rem;
 	white-space: nowrap;
 	pointer-events: none;
 	transform: translateX(-50%);
-}
-
-.tooltip strong {
-	font-family: var(--mono);
 }
 
 .tooltip.align-left {
@@ -205,9 +215,9 @@ button:focus-visible {
 .x-axis {
 	display: flex;
 	justify-content: space-between;
-	margin: 6px 0 12px 50px;
+	margin: 6px 0 10px 54px;
 	color: var(--muted);
-	font: 0.7rem var(--mono);
+	font-size: 0.68rem;
 }
 
 .legend,
@@ -217,14 +227,13 @@ button:focus-visible {
 }
 
 .legend {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 }
 
 .period-side {
 	min-width: 0;
-	padding: 16px 18px;
-	border-left: 1px solid var(--line);
-	background: var(--panel-raised);
+	padding: 20px 16px 12px;
+	border-left: 1px solid var(--line-strong);
 }
 
 .period-totals {
@@ -232,8 +241,8 @@ button:focus-visible {
 	grid-template-columns: repeat(3, auto);
 	justify-content: space-between;
 	gap: 12px;
-	margin: 0 0 16px;
-	padding-bottom: 14px;
+	margin: 0 0 14px;
+	padding-bottom: 12px;
 	border-bottom: 1px solid var(--line);
 }
 
@@ -243,7 +252,8 @@ button:focus-visible {
 
 .period-totals dd {
 	margin: 0;
-	font: 600 1.05rem var(--mono);
+	font-size: 1rem;
+	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 }
 
@@ -255,37 +265,35 @@ button:focus-visible {
 
 .top-hosts li {
 	display: grid;
-	padding: 6px 0;
-	border-top: 1px solid var(--line);
+	padding: 4px 0;
+	border-top: 1px dashed var(--line);
 }
 
 .top-hosts .muted {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 }
 
 .host {
 	overflow: hidden;
-	font-family: var(--mono);
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .history-notice {
-	margin: 12px 18px 0;
-	padding: 8px 12px;
+	margin: 20px 16px 0;
+	padding: 6px 10px;
 	border-left: 3px solid var(--alert);
-	border-radius: 4px;
 	background: var(--alert-soft);
 }
 
 .retention {
-	padding: 10px 18px;
+	padding: 6px 16px;
 	border-top: 1px solid var(--line);
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 }
 
 :host > .muted {
-	padding: 16px 18px;
+	padding: 22px 16px 14px;
 }
 
 @media (max-width: 960px) {
@@ -293,8 +301,13 @@ button:focus-visible {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
+	.chart {
+		flex: none;
+		height: 220px;
+	}
+
 	.period-side {
-		border-top: 1px solid var(--line);
+		border-top: 1px solid var(--line-strong);
 		border-left: 0;
 	}
 }
@@ -302,5 +315,17 @@ button:focus-visible {
 @media (max-width: 700px) {
 	.plot {
 		gap: 1px;
+	}
+
+	.history-heading {
+		gap: 6px;
+	}
+
+	.range-picker {
+		gap: 3px;
+	}
+
+	.range-picker button {
+		padding: 1px 5px;
 	}
 }

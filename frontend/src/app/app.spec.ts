@@ -156,6 +156,71 @@ describe('App', () => {
     expect(feedRows()).toEqual([2, 1]);
   });
 
+  function press(key: string, target: EventTarget = document): void {
+    target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    fixture.detectChanges();
+  }
+
+  it('should pause with P and deselect with Escape', () => {
+    events.next(packet({ packet_number: 1 }));
+    refresh();
+    click('.host-list button', '203.0.113.7');
+    expect(compiled.querySelector('.host-title')).toBeTruthy();
+
+    press('Escape');
+    expect(compiled.querySelector('.host-title')).toBeNull();
+
+    press('p');
+    events.next(packet({ packet_number: 2 }));
+    refresh();
+    expect(feedRows()).toEqual([1]);
+
+    press('P');
+    expect(feedRows()).toEqual([2, 1]);
+  });
+
+  it('should ignore shortcuts typed in a field or with a modifier', () => {
+    events.next(packet({ packet_number: 1 }));
+    refresh();
+    const field = document.createElement('input');
+    compiled.appendChild(field);
+
+    press('p', field);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p', ctrlKey: true }));
+    events.next(packet({ packet_number: 2 }));
+    refresh();
+
+    expect(feedRows()).toEqual([2, 1]);
+  });
+
+  it('should show the protocol mix and the recent rate', () => {
+    events.next(packet({ packet_number: 1 }));
+    events.next(packet({ packet_number: 2 }));
+    events.next(packet({ packet_number: 3, protocol: 'UDP' }));
+    // Deux rafraîchissements : une seconde de débit est échantillonnée.
+    refresh();
+    refresh();
+
+    const protocols = [...compiled.querySelectorAll('.protocol-list li')].map((row) =>
+      [...row.querySelectorAll(':scope > span')].map((cell) => cell.textContent?.trim()),
+    );
+    expect(protocols).toEqual([
+      ['TCP', '', '67 %'],
+      ['UDP', '', '33 %'],
+    ]);
+    expect(compiled.querySelector('.sparkline')?.textContent).toBe('█');
+  });
+
+  it('should announce live alerts to screen readers, not replayed ones', () => {
+    events.next(alert({ timestamp_ms: Date.now() - 3600000 }));
+    fixture.detectChanges();
+    expect(compiled.querySelector('[aria-live]')?.textContent).toBe('');
+
+    events.next(alert({ id: 4, timestamp_ms: Date.now() }));
+    fixture.detectChanges();
+    expect(compiled.querySelector('[aria-live]')?.textContent).toContain('Alerte Scan de ports');
+  });
+
   it('should drop the replayed history on reconnection', () => {
     events.next(packet());
     refresh();
