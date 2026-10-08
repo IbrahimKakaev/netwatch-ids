@@ -1,4 +1,4 @@
-name: Démo en ligne
+name: Démo et badges
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Publier le dashboard en mode démo
+    name: Publier la démo et les badges
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -34,6 +34,27 @@ jobs:
       - name: Build
         run: npm run build -- --base-href "/${{ github.event.repository.name }}/"
         working-directory: frontend
+
+      # Les badges du README lisent ces résultats, publiés avec la démo.
+      - name: Tests frontend avec couverture
+        working-directory: frontend
+        run: npm test -- --watch=false --coverage --coverage-reporters=json-summary | tee ../frontend-tests.log
+      - name: Installer libpcap
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Tests backend avec couverture
+        working-directory: backend
+        run: |
+          cargo llvm-cov --no-report | tee ../backend-tests.log
+          cargo llvm-cov report --json --summary-only --output-path ../backend-coverage.json
+      - name: Générer les badges
+        run: node .github/scripts/badges.mjs frontend/dist/frontend/browser/badges
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

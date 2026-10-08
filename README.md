@@ -1,6 +1,16 @@
 # NetWatch IDS
 
 [![CI](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/ci.yml/badge.svg)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/ci.yml)
+[![Démo](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/pages.yml/badge.svg)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/pages.yml)
+[![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fibrahimkakaev.github.io%2Fnetwatch-ids%2Fbadges%2Ftests.json)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/ci.yml)
+[![Couverture Rust](https://img.shields.io/endpoint?url=https%3A%2F%2Fibrahimkakaev.github.io%2Fnetwatch-ids%2Fbadges%2Fcoverage-backend.json)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/pages.yml)
+[![Couverture Angular](https://img.shields.io/endpoint?url=https%3A%2F%2Fibrahimkakaev.github.io%2Fnetwatch-ids%2Fbadges%2Fcoverage-frontend.json)](https://github.com/IbrahimKakaev/netwatch-ids/actions/workflows/pages.yml)
+
+[![Rust](https://img.shields.io/badge/Rust-édition_2024-b7410e?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Angular](https://img.shields.io/badge/Angular-22-dd0031?logo=angular&logoColor=white)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![SQLite](https://img.shields.io/badge/SQLite-embarqué-003b57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Dernier commit](https://img.shields.io/github/last-commit/IbrahimKakaev/netwatch-ids?label=dernier%20commit)](https://github.com/IbrahimKakaev/netwatch-ids/commits/main)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
 Système de détection d'intrusion réseau en temps réel : un moteur de capture et
@@ -21,7 +31,8 @@ lisible d'un coup d'œil.
   1 heure à 30 jours.
 - **Mode démo** : le dashboard fonctionne seul, sans backend, avec un trafic
   simulé et des attaques rejouées.
-- **Testé** : 26 tests côté Rust, 34 côté Angular, lancés à chaque push.
+- **Testé** : tests unitaires côté Rust et côté Angular, lancés à chaque push,
+  avec la couverture mesurée et publiée dans les badges ci-dessus.
 
 ## Démo en ligne
 
