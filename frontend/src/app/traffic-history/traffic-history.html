@@ -1,0 +1,88 @@
+<div class="history-heading">
+  <div>
+    <p class="eyebrow">HISTORIQUE</p>
+    <h2>Trafic enregistré</h2>
+  </div>
+  <div class="range-picker" role="group" aria-label="Période affichée">
+    @for (range of ranges; track range.hours) {
+      <button type="button" [class.active]="range.hours === hours()" [attr.aria-pressed]="range.hours === hours()" (click)="selectRange(range.hours)">
+        {{ range.label }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (failed()) {
+  <p class="history-notice" role="alert">Historique indisponible : le backend ne répond pas.</p>
+}
+
+@if (history(); as data) {
+  <div class="history-body">
+    <div class="chart-area">
+      <p class="chart-title">Paquets par intervalle</p>
+      <div class="chart">
+        <div class="y-axis" aria-hidden="true">
+          <span>{{ axisMax() | number }}</span>
+          <span>{{ axisMax() / 2 | number }}</span>
+          <span>0</span>
+        </div>
+        <div class="plot" (pointerleave)="hovered.set(null)">
+          <span class="grid-line top"></span>
+          <span class="grid-line middle"></span>
+          @for (bar of bars(); track bar.t; let index = $index) {
+            <div class="column" [class.hovered]="hovered() === index" (pointerenter)="hovered.set(index)">
+              @if (bar.alerts > 0) {
+                <span class="alert-mark" aria-hidden="true">!</span>
+              }
+              <div class="bar" [style.height.%]="bar.height"></div>
+            </div>
+          }
+          @if (hoveredBar(); as bar) {
+            <div class="tooltip" [style.left.%]="tooltipPosition(hovered()!)" [class.align-left]="tooltipPosition(hovered()!) < 18" [class.align-right]="tooltipPosition(hovered()!) > 82">
+              <strong>{{ intervalLabel(bar) }}</strong>
+              <span>{{ bar.packets | number }} paquets · {{ formatBytes(bar.bytes) }}</span>
+              @if (bar.alerts > 0) {
+                <span class="tooltip-alert"><span class="alert-mark inline">!</span>{{ bar.alerts }} alerte(s)</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="x-axis" aria-hidden="true">
+        @for (label of axisLabels(); track $index) {
+          <span>{{ label }}</span>
+        }
+      </div>
+      <p class="legend"><span class="alert-mark inline">!</span>Intervalle avec au moins une alerte</p>
+    </div>
+
+    <div class="period-side">
+      <dl class="period-totals">
+        <div><dt>Paquets</dt><dd>{{ totals().packets | number }}</dd></div>
+        <div><dt>Volume</dt><dd>{{ formatBytes(totals().bytes) }}</dd></div>
+        <div><dt>Alertes</dt><dd>{{ totals().alerts | number }}</dd></div>
+      </dl>
+
+      <p class="side-title">Hôtes les plus actifs</p>
+      @if (data.top_hosts.length === 0) {
+        <p class="muted">Aucun trafic enregistré sur la période. La première minute de capture apparaît dès qu'elle est terminée.</p>
+      } @else {
+        <ol class="top-hosts">
+          @for (host of data.top_hosts; track host.host) {
+            <li>
+              <span class="host">{{ host.host }}</span>
+              <span class="muted">{{ host.packets | number }} paquets · {{ formatBytes(host.bytes) }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </div>
+  </div>
+
+  <p class="retention">
+    Conservation en base : statistiques {{ data.retention.stats_days }} jours, alertes {{ data.retention.alert_days }} jours.
+    Le contenu des paquets n'est jamais enregistré.
+  </p>
+} @else if (!failed()) {
+  <p class="muted">Chargement de l'historique...</p>
+}
